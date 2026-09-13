@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, status
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import ORJSONResponse, Response
 
 from backend.app.core.dependencies import DepDB, dep_current_user
 from backend.app.core.rbac import ADMIN, PARSER_DEV, SEC_ANALYST, VIEWER, get_primary_role, require_roles
@@ -89,9 +89,10 @@ async def delete_source(
     id: str,
     db: DepDB,
     current_user: Annotated[object, Depends(require_roles(ADMIN))],
-) -> None:
+) -> Response:
     svc = _svc(db)
     await svc.delete(id, current_user.username, get_primary_role(current_user))  # type: ignore[attr-defined]
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/{id}/enable", response_model=SourceResponse)

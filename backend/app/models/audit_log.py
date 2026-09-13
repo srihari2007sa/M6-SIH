@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import enum
-
-from sqlalchemy import DateTime, Enum, Index, JSON, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
 from datetime import UTC, datetime
+
+from sqlalchemy import DateTime, Index, JSON, String, Text
+from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.app.db.base import UUIDMixin, Base
 
@@ -60,7 +60,7 @@ class AuditResult(str, enum.Enum):
 class AuditLog(UUIDMixin, Base):
     """
     Append-only audit log. Never update or delete rows.
-    Uses its own timestamp so it differs from AuditableMixin.
+    Columns use String instead of Enum to avoid PostgreSQL native enum type issues.
     """
     __tablename__ = "audit_logs"
     __table_args__ = (
@@ -77,19 +77,16 @@ class AuditLog(UUIDMixin, Base):
     )
     actor: Mapped[str] = mapped_column(String(128), nullable=False)
     actor_role: Mapped[str | None] = mapped_column(String(64), nullable=True)
-    action: Mapped[AuditAction] = mapped_column(
-        Enum(AuditAction, name="audit_action"), nullable=False
-    )
+    # Use String, not Enum, so no PostgreSQL enum type is required
+    action: Mapped[str] = mapped_column(String(64), nullable=False)
     resource_type: Mapped[str] = mapped_column(String(64), nullable=False)
     resource_id: Mapped[str | None] = mapped_column(String(256), nullable=True)
     version: Mapped[str | None] = mapped_column(String(32), nullable=True)
     before_state: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     after_state: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)
-    result: Mapped[AuditResult] = mapped_column(
-        Enum(AuditResult, name="audit_result"),
-        default=AuditResult.SUCCESS,
-        nullable=False,
+    result: Mapped[str] = mapped_column(
+        String(16), nullable=False, default=AuditResult.SUCCESS.value
     )
     request_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     extra: Mapped[dict | None] = mapped_column(JSON, nullable=True)

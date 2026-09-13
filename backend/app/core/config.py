@@ -51,16 +51,20 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
+        from urllib.parse import quote_plus
+        pwd = quote_plus(self.postgres_password)
         return (
-            f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}"
+            f"postgresql+asyncpg://{self.postgres_user}:{pwd}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
 
     @property
     def database_url_sync(self) -> str:
         """Used by Alembic (synchronous)."""
+        from urllib.parse import quote_plus
+        pwd = quote_plus(self.postgres_password)
         return (
-            f"postgresql+psycopg2://{self.postgres_user}:{self.postgres_password}"
+            f"postgresql+psycopg2://{self.postgres_user}:{pwd}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
 
@@ -127,7 +131,18 @@ class Settings(BaseSettings):
     @field_validator("cors_origins", mode="before")
     @classmethod
     def parse_cors(cls, v: Any) -> list[str]:
+        if isinstance(v, list):
+            return v
         if isinstance(v, str):
+            v = v.strip()
+            # Handle JSON array format: ["url1","url2"]
+            if v.startswith("["):
+                import json
+                try:
+                    return json.loads(v)
+                except Exception:
+                    pass
+            # Handle comma-separated format
             return [o.strip() for o in v.split(",") if o.strip()]
         return v
 

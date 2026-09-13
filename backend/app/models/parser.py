@@ -39,7 +39,7 @@ class Parser(AuditableMixin, Base):
     format: Mapped[str] = mapped_column(String(64), nullable=False)        # e.g. syslog, cef
     version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.0.0")
     status: Mapped[ParserStatus] = mapped_column(
-        Enum(ParserStatus, name="parser_status"),
+        Enum(ParserStatus, name="parser_status", native_enum=False),
         default=ParserStatus.DRAFT,
         nullable=False,
         index=True,
@@ -65,7 +65,7 @@ class ParserVersion(AuditableMixin, Base):
     )
     version: Mapped[str] = mapped_column(String(32), nullable=False)
     status: Mapped[ParserStatus] = mapped_column(
-        Enum(ParserStatus, name="parser_status"), nullable=False
+        Enum(ParserStatus, name="parser_status", native_enum=False), nullable=False
     )
     changed_by: Mapped[str | None] = mapped_column(String(128), nullable=True)
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)

@@ -1,29 +1,35 @@
 """
 M6 Control Plane — Security utilities: password hashing and JWT.
+Uses bcrypt directly (bypasses passlib bcrypt 5.x incompatibility).
 """
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from backend.app.core.config import get_settings
-
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 # ── Password ───────────────────────────────────────────────────────────────────
 
 def hash_password(plain: str) -> str:
     """Hash a plain-text password using bcrypt."""
-    return _pwd_context.hash(plain)
+    pwd_bytes = plain.encode("utf-8")
+    salt = bcrypt.gensalt(rounds=12)
+    return bcrypt.hashpw(pwd_bytes, salt).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
     """Return True if plain matches the bcrypt hash."""
-    return _pwd_context.verify(plain, hashed)
+    try:
+        pwd_bytes = plain.encode("utf-8")
+        hash_bytes = hashed.encode("utf-8")
+        return bcrypt.checkpw(pwd_bytes, hash_bytes)
+    except Exception:
+        return False
 
 
 # ── JWT ────────────────────────────────────────────────────────────────────────

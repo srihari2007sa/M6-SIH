@@ -30,16 +30,15 @@ class Service(AuditableMixin, Base):
     )   # e.g. "m1", "kafka", "opensearch"
     name: Mapped[str] = mapped_column(String(128), nullable=False)
     service_type: Mapped[ServiceType] = mapped_column(
-        Enum(ServiceType, name="service_type"), nullable=False
+        Enum(ServiceType, name="service_type", native_enum=False), nullable=False
     )
     base_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_critical: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    # Last known status — updated by health checks (not from DB, refreshed live)
     last_status: Mapped[ServiceStatus] = mapped_column(
-        Enum(ServiceStatus, name="service_status"),
+        Enum(ServiceStatus, name="service_status", native_enum=False),
         default=ServiceStatus.UNKNOWN,
         nullable=False,
     )

@@ -27,6 +27,7 @@ def get_engine() -> AsyncEngine:
             max_overflow=settings.database_max_overflow,
             echo=settings.is_development,
             future=True,
+            connect_args={"ssl": False},
         )
     return _engine
 

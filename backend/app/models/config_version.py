@@ -25,7 +25,7 @@ class ConfigurationVersion(AuditableMixin, Base):
     )  # e.g. "sources", "parsers"
     payload: Mapped[dict] = mapped_column(JSON, nullable=False)
     status: Mapped[ConfigDistributionStatus] = mapped_column(
-        Enum(ConfigDistributionStatus, name="config_dist_status"),
+        Enum(ConfigDistributionStatus, name="config_dist_status", native_enum=False),
         default=ConfigDistributionStatus.PENDING,
         nullable=False,
     )

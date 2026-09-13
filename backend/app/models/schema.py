@@ -37,7 +37,7 @@ class SchemaVersion(AuditableMixin, Base):
     )
     version: Mapped[str] = mapped_column(String(32), nullable=False)
     status: Mapped[SchemaStatus] = mapped_column(
-        Enum(SchemaStatus, name="schema_status"),
+        Enum(SchemaStatus, name="schema_status", native_enum=False),
         default=SchemaStatus.ACTIVE,
         nullable=False,
     )

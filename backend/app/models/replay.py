@@ -31,7 +31,7 @@ class ReplayOperation(AuditableMixin, Base):
         nullable=False,
     )
     status: Mapped[ReplayStatus] = mapped_column(
-        Enum(ReplayStatus, name="replay_status"),
+        Enum(ReplayStatus, name="replay_status", native_enum=False),
         default=ReplayStatus.REQUESTED,
         nullable=False,
         index=True,

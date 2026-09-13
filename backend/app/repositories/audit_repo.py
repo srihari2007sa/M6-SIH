@@ -34,14 +34,14 @@ class AuditRepository(BaseRepository[AuditLog]):
         log = AuditLog(
             actor=actor,
             actor_role=actor_role,
-            action=action,
+            action=action.value if hasattr(action, 'value') else action,
             resource_type=resource_type,
             resource_id=resource_id,
             version=version,
             before_state=before_state,
             after_state=after_state,
             reason=reason,
-            result=result,
+            result=result.value if hasattr(result, 'value') else result,
             request_id=request_id,
             extra=extra,
         )
@@ -66,7 +66,8 @@ class AuditRepository(BaseRepository[AuditLog]):
         if actor:
             filters.append(AuditLog.actor == actor)
         if action:
-            filters.append(AuditLog.action == action)
+            action_val = action.value if hasattr(action, 'value') else action
+            filters.append(AuditLog.action == action_val)
         if resource_type:
             filters.append(AuditLog.resource_type == resource_type)
         if resource_id:

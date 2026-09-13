@@ -29,7 +29,7 @@ class Source(AuditableMixin, Base):
     port: Mapped[int | None] = mapped_column(Integer, nullable=True)
     zone: Mapped[str | None] = mapped_column(String(64), nullable=True)
     status: Mapped[SourceStatus] = mapped_column(
-        Enum(SourceStatus, name="source_status"), default=SourceStatus.ACTIVE, nullable=False
+        Enum(SourceStatus, name="source_status", native_enum=False), default=SourceStatus.ACTIVE, nullable=False
     )
     parser_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
